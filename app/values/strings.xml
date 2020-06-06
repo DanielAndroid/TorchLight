@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Flashlight</string>
+    <string name="mute">Mute</string>
+    <string name="power_on">Turn flashlight on at start up</string>
+    <string name="power_off">Turn flashlight off at exit</string>
+    <string name="settings">Settings</string>
+</resources>

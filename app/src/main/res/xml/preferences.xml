@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="mute"
+        android:summaryOff=" sound disabled"
+        android:summaryOn=" sound enabled"
+        android:title="@string/mute" />
+
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="turn_on_at_start"
+        android:summaryOff="disabled"
+        android:summaryOn="enabled"
+        android:title="@string/power_on" />
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="turn_off_at_exit"
+        android:summaryOff="disabled"
+        android:summaryOn="enabled"
+        android:title="@string/power_off" />
+
+
+</PreferenceScreen>

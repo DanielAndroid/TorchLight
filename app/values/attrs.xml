@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="power">
+        <attr name="power_on" format="color" />
+        <attr name="power_off" format="color" />
+    </declare-styleable>
+
+</resources>
