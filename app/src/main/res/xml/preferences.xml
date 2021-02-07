@@ -5,8 +5,8 @@
     <SwitchPreference
         android:defaultValue="false"
         android:key="mute"
-        android:summaryOff=" sound disabled"
-        android:summaryOn=" sound enabled"
+        android:summaryOff=" sound enabled"
+        android:summaryOn=" sound disabled"
         android:title="@string/mute" />
 
 

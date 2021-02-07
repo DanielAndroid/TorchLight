@@ -1,7 +1,9 @@
 <resources>
     <string name="app_name">Torch Light</string>
     <string name="mute">Mute</string>
-    <string name="power_on">Turn Torch light on at start up</string>
-    <string name="power_off">Turn Torch light off at exit</string>
+    <string name="power_on">Turn torch light on at start up</string>
+    <string name="power_off">Turn torch light off at exit</string>
     <string name="settings">Settings</string>
+    <string name="image_description">Image of on/off button</string>
+
 </resources>

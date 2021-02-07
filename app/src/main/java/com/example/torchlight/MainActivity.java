@@ -5,9 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.AudioAttributes;
-import android.media.AudioManager;
 import android.media.SoundPool;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,17 +17,19 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 
 
 public class MainActivity extends AppCompatActivity {
 
     private ImageButton powerBtn;
-    private Boolean isTorchOn, isMuted;
+    private Boolean isMuted;
     private SoundPool soundPool;
     private int clickSound;
     Toolbar toolbar;
     SharedPreferences sharedPreferences;
+    TorchLightViewModel torchLightViewModel;
 
 
     @Override
@@ -38,25 +38,24 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        toolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        toolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
-        powerBtn = (ImageButton) findViewById(R.id.power_button);
-        isTorchOn = false;
+        powerBtn = findViewById(R.id.power_button);
+        torchLightViewModel = new ViewModelProvider(this).get(TorchLightViewModel.class);
+        torchLightViewModel.setIsTorchOn(torchLightViewModel.getIsTorchOn());
+        if (torchLightViewModel.getToggleImage() != 0) {
+            powerBtn.setImageResource(torchLightViewModel.getToggleImage());
+        }
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            AudioAttributes attributes = new AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .build();
-            soundPool = new SoundPool.Builder()
-                    .setAudioAttributes(attributes)
-                    .build();
-        } else {
-            soundPool = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
-
-        }
+        AudioAttributes attributes = new AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build();
+        soundPool = new SoundPool.Builder()
+                .setAudioAttributes(attributes)
+                .build();
 
         clickSound = soundPool.load(this, R.raw.click2_sebastian, 1);
 
@@ -88,14 +87,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 try {
-                    if (isTorchOn) {
-                        powerBtn.setImageResource(R.drawable.power_off_24dp);
-                        stopService(new Intent(MainActivity.this, FlashService.class));
-                        isTorchOn = false;
+                    if (torchLightViewModel.getIsTorchOn()) {
+                        torchLightViewModel.setToggleImage(R.drawable.torch_light_off);
+                        powerBtn.setImageResource(torchLightViewModel.getToggleImage());
+                        stopService(new Intent(MainActivity.this, TorchService.class));
+                        torchLightViewModel.setIsTorchOn(false);
                     } else {
-                        powerBtn.setImageResource(R.drawable.power_on_24dp);
-                        startService(new Intent(MainActivity.this, FlashService.class));
-                        isTorchOn = true;
+                        torchLightViewModel.setToggleImage(R.drawable.torch_light_on);
+                        powerBtn.setImageResource(torchLightViewModel.getToggleImage());
+                        startService(new Intent(MainActivity.this, TorchService.class));
+                        torchLightViewModel.setIsTorchOn(true);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -112,19 +113,20 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        Boolean turnOffAtExit = sharedPreferences.getBoolean("turn_off_at_exit", false);
+        boolean turnOffAtExit = sharedPreferences.getBoolean("turn_off_at_exit", false);
         if (turnOffAtExit) {
-            stopService(new Intent(getApplicationContext(), FlashService.class));
+            stopService(new Intent(getApplicationContext(), TorchService.class));
         }
     }
 
 
     public void flashLightOnAtStartup() {
-        Boolean turnOnAtStart = sharedPreferences.getBoolean("turn_on_at_start", false);
+        boolean turnOnAtStart = sharedPreferences.getBoolean("turn_on_at_start", false);
         if (turnOnAtStart) {
-            startService(new Intent(MainActivity.this, FlashService.class));
-            powerBtn.setImageResource(R.drawable.power_on_24dp);
-            isTorchOn = true;
+            startService(new Intent(MainActivity.this, TorchService.class));
+            torchLightViewModel.setToggleImage(R.drawable.torch_light_on);
+            powerBtn.setImageResource(torchLightViewModel.getToggleImage());
+            torchLightViewModel.setIsTorchOn(true);
         }
     }
 
@@ -137,17 +139,13 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.settings:
-                Intent settings = new Intent(MainActivity.this, SettingsActivity.class);
-                startActivity(settings);
-
-            default:
-                return true;
-        }
-
+        Intent settings = new Intent(MainActivity.this, SettingsActivity.class);
+        startActivity(settings);
+        return true;
     }
+
 }
+
 
 
 

@@ -11,10 +11,10 @@ import android.os.IBinder;
 import androidx.annotation.Nullable;
 
 
-public class FlashService extends Service {
+public class TorchService extends Service {
 
-    private CameraManager mCameraManager;
-    private String mCameraId;
+    private CameraManager cameraManager;
+    private String cameraId;
 
     @Nullable
     @Override
@@ -24,11 +24,13 @@ public class FlashService extends Service {
 
     @Override
     public void onCreate() {
-        mCameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
-        try {
-            mCameraId = mCameraManager.getCameraIdList()[0];
-        } catch (CameraAccessException e) {
-            e.printStackTrace();
+        cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+        if (cameraManager != null) {
+            try {
+                cameraId = cameraManager.getCameraIdList()[0];
+            } catch (CameraAccessException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -40,9 +42,7 @@ public class FlashService extends Service {
 
     public void turnOnFlashLight() {
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                mCameraManager.setTorchMode(mCameraId, true);
-            }
+            cameraManager.setTorchMode(cameraId, true);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -56,15 +56,11 @@ public class FlashService extends Service {
 
     public void turnOffFlashLight() {
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                mCameraManager.setTorchMode(mCameraId, false);
-            }
+            cameraManager.setTorchMode(cameraId, false);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
-
 }
 
 
